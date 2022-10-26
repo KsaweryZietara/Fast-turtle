@@ -6,6 +6,7 @@ import com.example.fastturtle.Exceptions.EmailTakenException;
 import com.example.fastturtle.Exceptions.UserNotFoundException;
 import com.example.fastturtle.Models.User;
 import com.example.fastturtle.Repositories.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,6 +59,7 @@ public class UserController {
     }
 
     @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteUser(@PathVariable Long id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

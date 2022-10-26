@@ -2,11 +2,10 @@ package com.example.fastturtle.Models;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 @Entity
-@Table(name = "posts")
-public class Post {
+@Table(name = "comments")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -15,28 +14,30 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    Post post;
+
     Timestamp creationTime;
 
     String content;
 
-    @OneToMany(mappedBy = "post")
-    List<Comment> comments;
-
-    public Post() {
+    public Comment() {
     }
 
-    public Post(User user, Timestamp creationTime, String content) {
+    public Comment(User user, Post post, Timestamp creationTime, String content) {
         this.user = user;
+        this.post = post;
         this.creationTime = creationTime;
         this.content = content;
     }
 
-    public Post(Long id, User user, Timestamp creationTime, String content, List<Comment> comments) {
+    public Comment(Long id, User user, Post post, Timestamp creationTime, String content) {
         this.id = id;
         this.user = user;
+        this.post = post;
         this.creationTime = creationTime;
         this.content = content;
-        this.comments = comments;
     }
 
     public Long getId() {
@@ -55,6 +56,14 @@ public class Post {
         this.user = user;
     }
 
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
     public Timestamp getCreationTime() {
         return creationTime;
     }
@@ -69,13 +78,5 @@ public class Post {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
     }
 }
