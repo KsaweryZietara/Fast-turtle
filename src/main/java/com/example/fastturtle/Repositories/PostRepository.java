@@ -1,7 +1,6 @@
 package com.example.fastturtle.Repositories;
 
 import com.example.fastturtle.Models.Post;
-import com.example.fastturtle.Models.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 

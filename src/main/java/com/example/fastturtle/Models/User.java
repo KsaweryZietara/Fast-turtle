@@ -1,7 +1,6 @@
 package com.example.fastturtle.Models;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +17,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Post> posts;
 
+    @OneToMany
+    private List<User> following;
+
     public User() {
     }
 
@@ -32,12 +34,24 @@ public class User {
         this.password = password;
     }
 
-    public User(Long id, String firstName, String lastName, String email, String password) {
+    public User(Long id, String firstName, String lastName, String email, String password, List<User> following) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.following = following;
+    }
+
+    public void follow(User user){
+        boolean contains = following.stream().anyMatch(x -> x.getId() == user.id);
+        if(!contains){
+            following.add(user);
+        }
+    }
+
+    public void unfollow(User user){
+        following.removeIf(x -> x.getId() == user.id);
     }
 
     public Long getId() {
@@ -78,5 +92,21 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public List<User> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<User> following) {
+        this.following = following;
     }
 }

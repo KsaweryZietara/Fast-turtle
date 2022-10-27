@@ -8,6 +8,7 @@ import com.example.fastturtle.Models.Post;
 import com.example.fastturtle.Models.User;
 import com.example.fastturtle.Repositories.PostRepository;
 import com.example.fastturtle.Repositories.UserRepository;
+import com.example.fastturtle.Services.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,13 +28,14 @@ import java.util.List;
 @RequestMapping("api/v1/post/")
 public class PostController {
     private final PostRepository postRepository;
-
     private final UserRepository userRepository;
+    private final Mapper mapper;
 
     @Autowired
-    public PostController(PostRepository postRepository, UserRepository userRepository) {
+    public PostController(PostRepository postRepository, UserRepository userRepository, Mapper mapper) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.mapper = mapper;
     }
 
     @GetMapping("{id}")
@@ -41,11 +43,7 @@ public class PostController {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
 
-        return new ReturnPostDto(id,
-                post.getUser().getFirstName(),
-                post.getUser().getLastName(),
-                post.getCreationTime(),
-                post.getContent());
+        return Mapper.toReturnPostDto(post);
     }
 
     @GetMapping("profile/{id}/{page}")
@@ -55,36 +53,23 @@ public class PostController {
         }
 
         Pageable pageable = PageRequest.of(page, 2, Sort.by("creationTime"));
-        //User user = new User(id);
 
-        List<Post> l = postRepository.findAllByUserId(id, pageable);
-        ArrayList<ReturnPostDto> posts = new ArrayList<>();
+        List<Post> posts = postRepository.findAllByUserId(id, pageable);
 
-        for (Post p : l){
-            posts.add(new ReturnPostDto(p.getId(),
-                    p.getUser().getFirstName(),
-                    p.getUser().getLastName(),
-                    p.getCreationTime(),
-                    p.getContent()));
-        }
-
-        return posts;
+        return Mapper.toReturnPostDto(posts);
     }
 
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody CreatePostDto createPostDto, UriComponentsBuilder builder){
+    public ResponseEntity<ReturnPostDto> createPost(@RequestBody CreatePostDto createPostDto, UriComponentsBuilder builder){
         if(!userRepository.existsById(createPostDto.userId())){
             throw new UserNotFoundException(createPostDto.userId());
         }
 
-        Post post = new Post(new User(createPostDto.userId()),
-                Timestamp.valueOf(LocalDateTime.now()),
-                createPostDto.content());
-
+        Post post = Mapper.toPost(createPostDto);
         Post createdPost = postRepository.save(post);
 
         URI location = builder.replacePath("api/v1/post/{id}").buildAndExpand(createdPost.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(Mapper.toReturnPostDto(createdPost));
     }
 
     @DeleteMapping("{id}")

@@ -2,6 +2,7 @@ package com.example.fastturtle.Models;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -25,9 +26,13 @@ public class Post {
     public Post() {
     }
 
-    public Post(User user, Timestamp creationTime, String content) {
+    public Post(Long id) {
+        this.id = id;
+    }
+
+    public Post(User user, String content) {
         this.user = user;
-        this.creationTime = creationTime;
+        this.creationTime = Timestamp.valueOf(LocalDateTime.now());
         this.content = content;
     }
 

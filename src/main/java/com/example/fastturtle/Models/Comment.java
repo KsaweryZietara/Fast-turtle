@@ -2,6 +2,7 @@ package com.example.fastturtle.Models;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
@@ -25,10 +26,10 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(User user, Post post, Timestamp creationTime, String content) {
+    public Comment(User user, Post post, String content) {
         this.user = user;
         this.post = post;
-        this.creationTime = creationTime;
+        this.creationTime = Timestamp.valueOf(LocalDateTime.now());
         this.content = content;
     }
 
