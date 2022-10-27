@@ -11,29 +11,11 @@ import java.util.List;
 
 @Service
 public class Mapper {
-    public static ReturnCommentDto toReturnCommentDto(Comment comment){
-        return new ReturnCommentDto(comment.getId(),
-                comment.getUser().getFirstName(),
-                comment.getUser().getLastName(),
-                comment.getCreationTime(),
-                comment.getContent());
-    }
-
-    public static List<ReturnCommentDto> toReturnCommentDto(List<Comment> comments){
-        ArrayList<ReturnCommentDto> result = new ArrayList<>();
-
-        for(Comment c : comments){
-            result.add(toReturnCommentDto(c));
-        }
-
-        return result;
-    }
-
-    public static ReturnUserDto toReturnUserDto(User user){
+    public ReturnUserDto toReturnUserDto(User user){
         return new ReturnUserDto(user.getId(), user.getFirstName(), user.getLastName());
     }
 
-    public static List<ReturnUserDto> toReturnUserDto(List<User> users){
+    public List<ReturnUserDto> toReturnUserDto(List<User> users){
         ArrayList<ReturnUserDto> result = new ArrayList<>();
 
         for(User u : users){
@@ -43,14 +25,14 @@ public class Mapper {
         return result;
     }
 
-    public static User toUser(CreateUserDto createUserDto){
+    public User toUser(CreateUserDto createUserDto){
         return new User(createUserDto.firstName(),
                 createUserDto.lastName(),
                 createUserDto.email(),
                 createUserDto.password());
     }
 
-    public static ReturnPostDto toReturnPostDto(Post post){
+    public ReturnPostDto toReturnPostDto(Post post){
         return new ReturnPostDto(post.getId(),
                 post.getUser().getFirstName(),
                 post.getUser().getLastName(),
@@ -58,7 +40,7 @@ public class Mapper {
                 post.getContent());
     }
 
-    public static List<ReturnPostDto> toReturnPostDto(List<Post> posts){
+    public List<ReturnPostDto> toReturnPostDto(List<Post> posts){
         ArrayList<ReturnPostDto> result = new ArrayList<>();
 
         for(Post p : posts){
@@ -68,9 +50,32 @@ public class Mapper {
         return result;
     }
 
-    public static Post toPost(CreatePostDto createPostDto){
+    public Post toPost(CreatePostDto createPostDto){
         return new Post(new User(createPostDto.userId()),
                 createPostDto.content());
     }
 
+    public ReturnCommentDto toReturnCommentDto(Comment comment){
+        return new ReturnCommentDto(comment.getId(),
+                comment.getUser().getFirstName(),
+                comment.getUser().getLastName(),
+                comment.getCreationTime(),
+                comment.getContent());
+    }
+
+    public List<ReturnCommentDto> toReturnCommentDto(List<Comment> comments){
+        ArrayList<ReturnCommentDto> result = new ArrayList<>();
+
+        for(Comment c : comments){
+            result.add(toReturnCommentDto(c));
+        }
+
+        return result;
+    }
+
+    public Comment toComment(CreateCommentDto createCommentDto){
+        return new Comment(new User(createCommentDto.userId()),
+                new Post(createCommentDto.postId()),
+                createCommentDto.content());
+    }
 }

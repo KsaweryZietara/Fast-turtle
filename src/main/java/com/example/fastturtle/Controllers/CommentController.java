@@ -6,7 +6,6 @@ import com.example.fastturtle.Exceptions.CommentNotFoundException;
 import com.example.fastturtle.Exceptions.PostNotFoundException;
 import com.example.fastturtle.Exceptions.UserNotFoundException;
 import com.example.fastturtle.Models.Comment;
-import com.example.fastturtle.Models.Post;
 import com.example.fastturtle.Models.User;
 import com.example.fastturtle.Repositories.CommentRepository;
 import com.example.fastturtle.Repositories.PostRepository;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,7 +45,7 @@ public class CommentController {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new CommentNotFoundException(id));
 
-        return Mapper.toReturnCommentDto(comment);
+        return mapper.toReturnCommentDto(comment);
     }
 
     @GetMapping("post/{id}/{page}")
@@ -58,7 +58,7 @@ public class CommentController {
 
         List<Comment> comments = commentRepository.findAllByPostId(id, pageable);
 
-        return Mapper.toReturnCommentDto(comments);
+        return mapper.toReturnCommentDto(comments);
     }
 
     @PostMapping
@@ -70,18 +70,17 @@ public class CommentController {
             throw new PostNotFoundException(createCommentDto.postId());
         }
 
-        Comment comment = new Comment(new User(createCommentDto.userId()),
-                new Post(createCommentDto.postId()),
-                createCommentDto.content());
+        Comment comment = mapper.toComment(createCommentDto);
 
         Comment createdComment = commentRepository.save(comment);
         createdComment.setUser(user);
 
         URI location = builder.replacePath("api/v1/comment/{id}").buildAndExpand(createdComment.getId()).toUri();
-        return ResponseEntity.created(location).body(Mapper.toReturnCommentDto(comment));
+        return ResponseEntity.created(location).body(mapper.toReturnCommentDto(comment));
     }
 
     @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable Long id){
         if (!commentRepository.existsById(id)){
             throw new CommentNotFoundException(id);

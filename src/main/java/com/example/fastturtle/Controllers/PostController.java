@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +41,7 @@ public class PostController {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
 
-        return Mapper.toReturnPostDto(post);
+        return mapper.toReturnPostDto(post);
     }
 
     @GetMapping("profile/{id}/{page}")
@@ -52,24 +50,40 @@ public class PostController {
             throw new UserNotFoundException(id);
         }
 
-        Pageable pageable = PageRequest.of(page, 2, Sort.by("creationTime"));
+        Pageable pageable = PageRequest.of(page, 2, Sort.by("creationTime").descending());
 
         List<Post> posts = postRepository.findAllByUserId(id, pageable);
 
-        return Mapper.toReturnPostDto(posts);
+        return mapper.toReturnPostDto(posts);
+    }
+
+    @GetMapping("homepage/{id}/{page}")
+    public List<ReturnPostDto> getHomePageByUserId(@PathVariable Long id, @PathVariable int page){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        List<Long> ids = new ArrayList<>();
+        for (User u : user.getFollowing()){
+            ids.add(u.getId());
+        }
+
+        Pageable pageable = PageRequest.of(page, 2, Sort.by("creationTime").descending());
+        List<Post> posts = postRepository.findAllByUserIdIn(ids, pageable);
+
+        return mapper.toReturnPostDto(posts);
     }
 
     @PostMapping
     public ResponseEntity<ReturnPostDto> createPost(@RequestBody CreatePostDto createPostDto, UriComponentsBuilder builder){
-        if(!userRepository.existsById(createPostDto.userId())){
-            throw new UserNotFoundException(createPostDto.userId());
-        }
+        User user = userRepository.findById(createPostDto.userId())
+                .orElseThrow(() -> new UserNotFoundException(createPostDto.userId()));
 
-        Post post = Mapper.toPost(createPostDto);
+        Post post = mapper.toPost(createPostDto);
         Post createdPost = postRepository.save(post);
+        createdPost.setUser(user);
 
         URI location = builder.replacePath("api/v1/post/{id}").buildAndExpand(createdPost.getId()).toUri();
-        return ResponseEntity.created(location).body(Mapper.toReturnPostDto(createdPost));
+        return ResponseEntity.created(location).body(mapper.toReturnPostDto(createdPost));
     }
 
     @DeleteMapping("{id}")

@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
     public List<Post> findAllByUserId(Long id, Pageable pageable);
+
+    public List<Post> findAllByUserIdIn(List<Long> ids, Pageable pageable);
 }

@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path="api/v1/user/")
@@ -30,7 +29,7 @@ public class UserController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        return Mapper.toReturnUserDto(user);
+        return mapper.toReturnUserDto(user);
     }
 
     @GetMapping("following/{id}")
@@ -38,7 +37,7 @@ public class UserController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        return Mapper.toReturnUserDto(user.getFollowing());
+        return mapper.toReturnUserDto(user.getFollowing());
     }
 
     @PostMapping
@@ -47,10 +46,10 @@ public class UserController {
             throw new EmailTakenException(createUserDto.email());
         }
 
-        User user = Mapper.toUser(createUserDto);
+        User user = mapper.toUser(createUserDto);
         userRepository.save(user);
 
-        return Mapper.toReturnUserDto(user);
+        return mapper.toReturnUserDto(user);
     }
 
     @PutMapping("{id}")
@@ -66,7 +65,7 @@ public class UserController {
         user.setPassword(updateUserDto.password());
         userRepository.save(user);
 
-        return Mapper.toReturnUserDto(user);
+        return mapper.toReturnUserDto(user);
     }
 
     @PutMapping("{id}/follow/{followId}")
