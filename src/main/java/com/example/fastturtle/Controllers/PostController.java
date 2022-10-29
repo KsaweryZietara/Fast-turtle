@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ReturnPostDto> createPost(@RequestBody CreatePostDto createPostDto, UriComponentsBuilder builder){
+    public ResponseEntity<ReturnPostDto> createPost(@Valid @RequestBody CreatePostDto createPostDto, UriComponentsBuilder builder){
         User user = userRepository.findById(createPostDto.userId())
                 .orElseThrow(() -> new UserNotFoundException(createPostDto.userId()));
 

@@ -2,6 +2,7 @@ package com.example.fastturtle.Repositories;
 
 import com.example.fastturtle.Models.Post;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;

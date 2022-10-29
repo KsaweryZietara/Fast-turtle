@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<ReturnCommentDto> createComment(@RequestBody CreateCommentDto createCommentDto, UriComponentsBuilder builder){
+    public ResponseEntity<ReturnCommentDto> createComment(@Valid @RequestBody CreateCommentDto createCommentDto, UriComponentsBuilder builder){
         User user = userRepository.findById(createCommentDto.userId())
                 .orElseThrow(() -> new UserNotFoundException(createCommentDto.userId()));
 

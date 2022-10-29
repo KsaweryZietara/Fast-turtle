@@ -11,6 +11,7 @@ import com.example.fastturtle.Services.Mapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ReturnUserDto createUser(@RequestBody CreateUserDto createUserDto){
+    public ReturnUserDto createUser(@Valid @RequestBody CreateUserDto createUserDto){
         if(userRepository.existsUserByEmail(createUserDto.email())){
             throw new EmailTakenException(createUserDto.email());
         }
@@ -53,7 +54,7 @@ public class UserController {
     }
 
     @PutMapping("{id}")
-    public ReturnUserDto updateUser(@RequestBody UpdateUserDto updateUserDto, @PathVariable Long id){
+    public ReturnUserDto updateUser(@Valid @RequestBody UpdateUserDto updateUserDto, @PathVariable Long id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
